@@ -20,7 +20,7 @@ export const INVADER_CONFIG = {
   height: 24,
   horizontalSpeed: 1,
   verticalDrop: 20,
-  shootProbability: 0.001,
+  shootProbability: 0.0002, // Reduced to 1/5 of original
   bulletSpeed: 3,
   types: {
     squid: { rows: [0], points: 30 },

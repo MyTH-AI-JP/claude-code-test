@@ -12,12 +12,14 @@ import {
 } from '@/constants/game';
 import { useGameLoop } from '@/hooks/useGameLoop';
 import { checkCollision, isOutOfBounds } from '@/utils/collision';
+import { drawPlayer, drawSquid, drawCrab, drawOctopus, drawUFO, drawBunker, drawBullet } from '@/utils/drawing';
 
 const SpaceInvaders: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [keys, setKeys] = useState<{ [key: string]: boolean }>({});
   const lastShotRef = useRef<number>(0);
   const invaderDirectionRef = useRef<number>(1);
+  const frameRef = useRef<number>(0);
   const [gameState, setGameState] = useState<GameState>(() => initializeGame());
 
   function initializeGame(level: number = 1): GameState {
@@ -301,6 +303,9 @@ const SpaceInvaders: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Increment frame counter for animations
+    frameRef.current++;
+
     // Clear canvas
     ctx.fillStyle = COLORS.background;
     ctx.fillRect(0, 0, GAME_CONFIG.width, GAME_CONFIG.height);
@@ -309,16 +314,7 @@ const SpaceInvaders: React.FC = () => {
     if (gameState.gameStatus !== 'menu') {
       // Draw player
       if (gameState.player.isAlive) {
-        ctx.shadowColor = COLORS.playerGlow;
-        ctx.shadowBlur = 20;
-        ctx.fillStyle = COLORS.player;
-        ctx.fillRect(
-          gameState.player.position.x,
-          gameState.player.position.y,
-          gameState.player.width,
-          gameState.player.height
-        );
-        ctx.shadowBlur = 0;
+        drawPlayer(ctx, gameState.player.position, gameState.player.width, gameState.player.height);
       }
 
       // Draw invaders
@@ -327,60 +323,32 @@ const SpaceInvaders: React.FC = () => {
         
         switch (invader.type) {
           case 'squid':
-            ctx.fillStyle = COLORS.invaderSquid;
+            drawSquid(ctx, invader.position, invader.width, invader.height, frameRef.current);
             break;
           case 'crab':
-            ctx.fillStyle = COLORS.invaderCrab;
+            drawCrab(ctx, invader.position, invader.width, invader.height, frameRef.current);
             break;
           case 'octopus':
-            ctx.fillStyle = COLORS.invaderOctopus;
+            drawOctopus(ctx, invader.position, invader.width, invader.height, frameRef.current);
             break;
         }
-        
-        ctx.fillRect(
-          invader.position.x,
-          invader.position.y,
-          invader.width,
-          invader.height
-        );
       });
 
       // Draw UFO
       if (gameState.ufo) {
-        ctx.fillStyle = COLORS.ufo;
-        ctx.fillRect(
-          gameState.ufo.position.x,
-          gameState.ufo.position.y,
-          gameState.ufo.width,
-          gameState.ufo.height
-        );
+        drawUFO(ctx, gameState.ufo.position, gameState.ufo.width, gameState.ufo.height, frameRef.current);
       }
 
       // Draw bunkers
       gameState.bunkers.forEach(bunker => {
         if (!bunker.isAlive) return;
-        
-        const opacity = bunker.health / bunker.maxHealth;
-        ctx.fillStyle = `${COLORS.bunker}${Math.floor(opacity * 255).toString(16).padStart(2, '0')}`;
-        ctx.fillRect(
-          bunker.position.x,
-          bunker.position.y,
-          bunker.width,
-          bunker.height
-        );
+        drawBunker(ctx, bunker.position, bunker.width, bunker.height, bunker.health, bunker.maxHealth);
       });
 
       // Draw bullets
       gameState.bullets.forEach(bullet => {
         if (!bullet.isAlive) return;
-        
-        ctx.fillStyle = bullet.isPlayerBullet ? COLORS.bullet : COLORS.enemyBullet;
-        ctx.fillRect(
-          bullet.position.x,
-          bullet.position.y,
-          bullet.width,
-          bullet.height
-        );
+        drawBullet(ctx, bullet.position, bullet.width, bullet.height, bullet.isPlayerBullet);
       });
 
       // Draw UI
