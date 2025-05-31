@@ -25,7 +25,7 @@ const SpaceInvaders: React.FC = () => {
   const frameRef = useRef<number>(0);
   const [gameState, setGameState] = useState<GameState>(() => initializeGame());
 
-  function initializeGame(level: number = 1): GameState {
+  function initializeGame(level: number = 1, currentScore: number = 0): GameState {
     const invaders: Invader[] = [];
     const startX = 100;
     const startY = 100;
@@ -79,9 +79,9 @@ const SpaceInvaders: React.FC = () => {
       bunkers,
       ufo: null,
       explosions: [],
-      score: 0,
+      score: currentScore, // Preserve score from previous levels
       level,
-      gameStatus: 'menu',
+      gameStatus: level > 1 ? 'playing' : 'menu', // Continue playing if advancing levels
       highScore: typeof window !== 'undefined' ? parseInt(localStorage.getItem('spaceInvadersHighScore') || '0') : 0,
     };
   }
@@ -307,8 +307,10 @@ const SpaceInvaders: React.FC = () => {
       // Check if all invaders are destroyed
       if (aliveInvaders.length === 0) {
         newState.gameStatus = 'levelComplete';
+        const finalScore = newState.score; // Capture the score before timeout
+        const nextLevel = newState.level + 1;
         setTimeout(() => {
-          setGameState(initializeGame(newState.level + 1));
+          setGameState(initializeGame(nextLevel, finalScore));
         }, 2000);
       }
 
