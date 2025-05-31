@@ -34,12 +34,30 @@ export interface Bunker extends GameObject {
   maxHealth: number;
 }
 
+export interface Explosion {
+  position: Position;
+  radius: number;
+  maxRadius: number;
+  color: string;
+  particles: Array<{
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    size: number;
+    life: number;
+  }>;
+  life: number;
+  maxLife: number;
+}
+
 export interface GameState {
   player: Player;
   invaders: Invader[];
   bullets: Bullet[];
   bunkers: Bunker[];
   ufo: UFO | null;
+  explosions: Explosion[];
   score: number;
   level: number;
   gameStatus: 'menu' | 'playing' | 'paused' | 'gameOver' | 'levelComplete';

@@ -12,7 +12,10 @@ import {
 } from '@/constants/game';
 import { useGameLoop } from '@/hooks/useGameLoop';
 import { checkCollision, isOutOfBounds } from '@/utils/collision';
-import { drawPlayer, drawSquid, drawCrab, drawOctopus, drawUFO, drawBunker, drawBullet } from '@/utils/drawing';
+import { 
+  drawPlayer, drawSquid, drawCrab, drawOctopus, drawUFO, drawBunker, drawBullet,
+  createExplosion, drawExplosion, updateExplosion 
+} from '@/utils/drawing';
 
 const SpaceInvaders: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -75,6 +78,7 @@ const SpaceInvaders: React.FC = () => {
       bullets: [],
       bunkers,
       ufo: null,
+      explosions: [],
       score: 0,
       level,
       gameStatus: 'menu',
@@ -223,6 +227,16 @@ const SpaceInvaders: React.FC = () => {
             bullet.isAlive = false;
             invader.isAlive = false;
             newState.score += invader.points;
+            
+            // Create explosion for invader
+            const explosionColor = invader.type === 'squid' ? COLORS.invaderSquid :
+                                  invader.type === 'crab' ? COLORS.invaderCrab :
+                                  COLORS.invaderOctopus;
+            newState.explosions.push(createExplosion(
+              { x: invader.position.x + invader.width / 2, y: invader.position.y + invader.height / 2 },
+              explosionColor,
+              'medium'
+            ));
           }
         });
 
@@ -230,6 +244,14 @@ const SpaceInvaders: React.FC = () => {
         if (newState.ufo && checkCollision(bullet, newState.ufo)) {
           bullet.isAlive = false;
           newState.score += newState.ufo.points;
+          
+          // Create explosion for UFO
+          newState.explosions.push(createExplosion(
+            { x: newState.ufo.position.x + newState.ufo.width / 2, y: newState.ufo.position.y + newState.ufo.height / 2 },
+            COLORS.ufo,
+            'large'
+          ));
+          
           newState.ufo = null;
         }
 
@@ -252,6 +274,14 @@ const SpaceInvaders: React.FC = () => {
         if (newState.player.isAlive && checkCollision(bullet, newState.player)) {
           bullet.isAlive = false;
           newState.player.lives--;
+          
+          // Create explosion for player hit
+          newState.explosions.push(createExplosion(
+            { x: newState.player.position.x + newState.player.width / 2, y: newState.player.position.y + newState.player.height / 2 },
+            COLORS.player,
+            'large'
+          ));
+          
           if (newState.player.lives <= 0) {
             newState.gameStatus = 'gameOver';
             if (newState.score > newState.highScore) {
@@ -288,6 +318,9 @@ const SpaceInvaders: React.FC = () => {
           newState.gameStatus = 'gameOver';
         }
       });
+
+      // Update explosions
+      newState.explosions = newState.explosions.filter(explosion => updateExplosion(explosion));
 
       return newState;
     });
@@ -349,6 +382,11 @@ const SpaceInvaders: React.FC = () => {
       gameState.bullets.forEach(bullet => {
         if (!bullet.isAlive) return;
         drawBullet(ctx, bullet.position, bullet.width, bullet.height, bullet.isPlayerBullet);
+      });
+
+      // Draw explosions
+      gameState.explosions.forEach(explosion => {
+        drawExplosion(ctx, explosion);
       });
 
       // Draw UI

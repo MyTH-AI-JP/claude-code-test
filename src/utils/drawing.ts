@@ -1,4 +1,4 @@
-import { Position } from '@/types/game';
+import { Position, Explosion } from '@/types/game';
 import { COLORS } from '@/constants/game';
 
 export const drawPlayer = (ctx: CanvasRenderingContext2D, position: Position, width: number, height: number) => {
@@ -296,4 +296,120 @@ export const drawBullet = (ctx: CanvasRenderingContext2D, position: Position, wi
   }
   
   ctx.restore();
+};
+
+export const createExplosion = (position: Position, color: string, size: 'small' | 'medium' | 'large' = 'medium'): Explosion => {
+  const sizeConfig = {
+    small: { maxRadius: 20, particleCount: 8, maxLife: 20 },
+    medium: { maxRadius: 30, particleCount: 12, maxLife: 30 },
+    large: { maxRadius: 40, particleCount: 16, maxLife: 40 }
+  };
+
+  const config = sizeConfig[size];
+  const particles = [];
+
+  for (let i = 0; i < config.particleCount; i++) {
+    const angle = (Math.PI * 2 * i) / config.particleCount;
+    const speed = 2 + Math.random() * 3;
+    particles.push({
+      x: position.x,
+      y: position.y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      size: 2 + Math.random() * 4,
+      life: 1
+    });
+  }
+
+  return {
+    position,
+    radius: 0,
+    maxRadius: config.maxRadius,
+    color,
+    particles,
+    life: config.maxLife,
+    maxLife: config.maxLife
+  };
+};
+
+export const drawExplosion = (ctx: CanvasRenderingContext2D, explosion: Explosion) => {
+  ctx.save();
+  
+  const lifeRatio = explosion.life / explosion.maxLife;
+  const expansionRatio = 1 - lifeRatio;
+  
+  // Central blast
+  if (lifeRatio > 0.5) {
+    ctx.globalAlpha = lifeRatio;
+    ctx.fillStyle = explosion.color;
+    ctx.shadowColor = explosion.color;
+    ctx.shadowBlur = 20;
+    ctx.beginPath();
+    ctx.arc(
+      explosion.position.x, 
+      explosion.position.y, 
+      explosion.maxRadius * expansionRatio * 0.5, 
+      0, 
+      Math.PI * 2
+    );
+    ctx.fill();
+  }
+  
+  // Shockwave ring
+  if (lifeRatio > 0.3) {
+    ctx.globalAlpha = lifeRatio * 0.5;
+    ctx.strokeStyle = explosion.color;
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 30;
+    ctx.beginPath();
+    ctx.arc(
+      explosion.position.x, 
+      explosion.position.y, 
+      explosion.maxRadius * expansionRatio, 
+      0, 
+      Math.PI * 2
+    );
+    ctx.stroke();
+  }
+  
+  // Particles
+  ctx.shadowBlur = 0;
+  explosion.particles.forEach(particle => {
+    if (particle.life > 0) {
+      ctx.globalAlpha = particle.life * lifeRatio;
+      ctx.fillStyle = explosion.color;
+      ctx.beginPath();
+      ctx.arc(particle.x, particle.y, particle.size * particle.life, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Particle trail
+      ctx.globalAlpha = particle.life * lifeRatio * 0.3;
+      ctx.strokeStyle = explosion.color;
+      ctx.lineWidth = particle.size * 0.5;
+      ctx.beginPath();
+      ctx.moveTo(particle.x, particle.y);
+      ctx.lineTo(particle.x - particle.vx * 2, particle.y - particle.vy * 2);
+      ctx.stroke();
+    }
+  });
+  
+  ctx.restore();
+};
+
+export const updateExplosion = (explosion: Explosion): boolean => {
+  explosion.life--;
+  
+  // Update particles
+  explosion.particles.forEach(particle => {
+    particle.x += particle.vx;
+    particle.y += particle.vy;
+    particle.vx *= 0.98; // Friction
+    particle.vy *= 0.98;
+    particle.life -= 0.03;
+  });
+  
+  // Update radius
+  explosion.radius = explosion.maxRadius * (1 - explosion.life / explosion.maxLife);
+  
+  return explosion.life > 0;
 };

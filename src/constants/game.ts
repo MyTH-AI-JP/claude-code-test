@@ -18,7 +18,7 @@ export const INVADER_CONFIG = {
   cols: 11,
   width: 30,
   height: 24,
-  horizontalSpeed: 1,
+  horizontalSpeed: 0.5, // Reduced to half speed
   verticalDrop: 20,
   shootProbability: 0.0002, // Reduced to 1/5 of original
   bulletSpeed: 3,
