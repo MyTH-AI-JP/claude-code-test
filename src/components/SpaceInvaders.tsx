@@ -16,6 +16,7 @@ import {
   drawPlayer, drawSquid, drawCrab, drawOctopus, drawUFO, drawBunker, drawBullet,
   createExplosion, drawExplosion, updateExplosion 
 } from '@/utils/drawing';
+import { audioSystem } from '@/utils/audio';
 
 const SpaceInvaders: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -90,6 +91,8 @@ const SpaceInvaders: React.FC = () => {
     setKeys(prev => ({ ...prev, [e.key]: true }));
     
     if (e.key === 'Enter' && gameState.gameStatus === 'menu') {
+      audioSystem.resume();
+      audioSystem.startMusic();
       setGameState(prev => ({ ...prev, gameStatus: 'playing' }));
     }
     
@@ -100,7 +103,12 @@ const SpaceInvaders: React.FC = () => {
     }
     
     if (e.key === 'r' && (gameState.gameStatus === 'gameOver' || gameState.gameStatus === 'levelComplete')) {
+      audioSystem.startMusic();
       setGameState(initializeGame());
+    }
+    
+    if (e.key === 'm' || e.key === 'M') {
+      audioSystem.toggleMute();
     }
   }, [gameState.gameStatus]);
 
@@ -146,6 +154,7 @@ const SpaceInvaders: React.FC = () => {
           velocity: -PLAYER_CONFIG.bulletSpeed,
           isPlayerBullet: true,
         });
+        audioSystem.playShoot();
         lastShotRef.current = now;
       }
 
@@ -237,6 +246,7 @@ const SpaceInvaders: React.FC = () => {
               explosionColor,
               'medium'
             ));
+            audioSystem.playEnemyHit();
           }
         });
 
@@ -251,6 +261,7 @@ const SpaceInvaders: React.FC = () => {
             COLORS.ufo,
             'large'
           ));
+          audioSystem.playUFOHit();
           
           newState.ufo = null;
         }
@@ -281,9 +292,11 @@ const SpaceInvaders: React.FC = () => {
             COLORS.player,
             'large'
           ));
+          audioSystem.playPlayerHit();
           
           if (newState.player.lives <= 0) {
             newState.gameStatus = 'gameOver';
+            audioSystem.stopMusic();
             if (newState.score > newState.highScore) {
               newState.highScore = newState.score;
               if (typeof window !== 'undefined') {
@@ -476,7 +489,7 @@ const SpaceInvaders: React.FC = () => {
         />
       </div>
       <div className="mt-4 text-cyan-400 font-mono text-sm">
-        <p>Controls: ← → Move | SPACE Shoot | P Pause | R Restart</p>
+        <p>Controls: ← → Move | SPACE Shoot | P Pause | R Restart | M Mute</p>
       </div>
     </div>
   );
