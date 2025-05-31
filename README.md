@@ -1,36 +1,151 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Space Invaders - Futuristic Edition 🚀
 
-## Getting Started
+A modern, futuristic take on the classic Space Invaders arcade game built with Next.js, TypeScript, and HTML5 Canvas.
 
-First, run the development server:
+## 🎮 Play Now
 
+Visit the live demo: [Deploy on Vercel](#deployment)
+
+## 🌟 Features
+
+- **Classic Gameplay**: Authentic Space Invaders experience with modern enhancements
+- **Futuristic Design**: Neon colors, glow effects, and sleek visuals
+- **Complete Game Mechanics**:
+  - Player movement and shooting
+  - Multiple invader types (Squid, Crab, Octopus) with different point values
+  - UFO bonus targets
+  - Destructible bunkers for protection
+  - Progressive difficulty with level advancement
+  - Lives and scoring system
+  - High score persistence
+- **Responsive Controls**: Smooth keyboard controls with arrow keys and spacebar
+- **Game States**: Menu, playing, paused, game over, and level complete screens
+
+## 🎯 How to Play
+
+- **Arrow Keys (← →)**: Move your spaceship left and right
+- **Spacebar**: Fire bullets at invaders
+- **P**: Pause/Resume the game
+- **R**: Restart after game over
+- **Enter**: Start game from menu
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- npm or yarn package manager
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/MyTH-AI-JP/claude-code-test.git
+cd claude-code-test
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-## Learn More
+## 🏗️ Building for Production
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+npm start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📦 Deployment
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Deploy to Vercel
 
-## Deploy on Vercel
+The easiest way to deploy this Space Invaders game is using Vercel:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/MyTH-AI-JP/claude-code-test)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Or deploy manually:
+
+1. Install Vercel CLI:
+```bash
+npm i -g vercel
+```
+
+2. Deploy:
+```bash
+vercel
+```
+
+### Environment Variables
+
+No environment variables are required for this game.
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 15
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Rendering**: HTML5 Canvas
+- **Deployment**: Vercel
+
+## 📁 Project Structure
+
+```
+claude-code-test/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx          # Main page component
+│   │   ├── layout.tsx        # App layout
+│   │   └── globals.css       # Global styles
+│   ├── components/
+│   │   └── SpaceInvaders.tsx # Main game component
+│   ├── constants/
+│   │   └── game.ts          # Game configuration
+│   ├── types/
+│   │   └── game.ts          # TypeScript interfaces
+│   ├── hooks/
+│   │   └── useGameLoop.ts   # Game loop hook
+│   └── utils/
+│       └── collision.ts     # Collision detection
+├── public/                  # Static assets
+├── package.json
+└── README.md
+```
+
+## 🎮 Game Details
+
+### Scoring
+- **Octopus Invaders**: 10 points
+- **Crab Invaders**: 20 points
+- **Squid Invaders**: 30 points
+- **UFO**: 50-300 points (random)
+
+### Game Mechanics
+- Invaders move horizontally and drop down when reaching screen edges
+- Speed increases with each level
+- Player has 3 lives
+- Bunkers provide destructible cover
+- UFO appears randomly for bonus points
+
+## 🤝 Contributing
+
+Feel free to open issues or submit pull requests for improvements!
+
+## 📝 License
+
+This project is open source and available under the MIT License.
+
+## 🙏 Credits
+
+Created with ❤️ by MyTH-AI-JP using Claude Code
+
+---
+
+Built with [Next.js](https://nextjs.org/) and deployed on [Vercel](https://vercel.com/)
